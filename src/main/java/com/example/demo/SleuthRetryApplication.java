@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 import java.time.Duration;
 
@@ -47,7 +48,7 @@ public class SleuthRetryApplication {
                                     .uri("/error")
                                     .retrieve()
                                     .bodyToMono(String.class)
-                                    .retryBackoff(3, Duration.ofMillis(100))
+                                    .retryWhen(Retry.backoff(3, Duration.ofMillis(100)))
                                     .doOnError(throwable -> log.error("Error response", throwable));
 
                             log.info("Request mono is created");
